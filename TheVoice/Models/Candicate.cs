@@ -8,6 +8,10 @@ namespace TheVoice.Models
         [Key]
         public int Id { get; set; }
 
+        public string UserId { get; set; }
+
+        public string Name { get; set; }
+
         [ForeignKey(nameof(Team))]
         public int? TeamId { get; set; }
 

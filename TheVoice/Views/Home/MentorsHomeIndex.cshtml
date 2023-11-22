@@ -1,0 +1,49 @@
+﻿@model TheVoice.Models.ViewModels.MentorHomeIndexVM
+@{
+    ViewData["Title"] = "Home";
+}
+
+<div class="text-center">
+    <h3 class="display-4">Review</h3>
+</div>
+
+<div>
+    <h5>Teams</h5>
+
+    @foreach(var team in Model.Mentor.Teams)
+    {
+        <div>
+            <div><h5>@team.Name</h5></div>
+             @foreach(var candid in team.Candidates){
+                 <div> 
+                     <a class='btn' data-bs-toggle='collapse' href='#t-@candid.Id'
+                     role='button' aria-expanded='false' aria-controls='t-@candid.Id'
+                     >@candid.Name</a>
+                     <div id='t-@candid.Id' class='collapse'>
+                         <div>@candid.Activities.Count</div>
+                         <table>
+                             <thead>
+                                 <tr>
+                                     <th>Song</th>
+                                     <th>Date</th>
+                                     <th>Score</th>
+                                 </tr>
+                             </thead>
+                             <tbody>
+                                @foreach(var activity in candid.Activities)
+                                {
+                                    <tr>
+                                        <td>@activity.SongName</td>
+                                        <td>@activity.Date</td>
+                                        <td>@activity.Scores</td>
+                                    </tr>
+                                }
+                             </tbody>
+                         </table>
+                         <div>Avg: @team.AverageScore</div>
+                     </div>
+                 </div>
+             }
+        </div>
+    }
+</div>
