@@ -16,3 +16,31 @@ html {
 body {
   margin-bottom: 60px;
 }
+
+.team-name-as-header {
+    background-color: lightgray;
+    width: 100%;
+    color: black;
+}
+
+.Candicate-expander-btn{
+    background-color:none;
+    border:none;
+    padding:2px;
+    text-decoration:none;
+    color:black;
+    display:block;
+    width:100%;
+}
+
+.Candicate-expander-btn:hover{
+    color:black;
+}
+
+Candicate-expander-btn:visited {
+    color: black;
+}
+
+Candicate-expander-btn:active {
+    color: black;
+}

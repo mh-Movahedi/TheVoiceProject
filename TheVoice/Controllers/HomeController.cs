@@ -1,11 +1,14 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System.Diagnostics;
 using TheVoice.Data;
 using TheVoice.Models;
 using TheVoice.Models.ViewModels;
 using TheVoice.Providers.Builders;
 using TheVoice.Providers.DB;
+using TheVoice.Providers.User;
 
 namespace TheVoice.Controllers
 {
@@ -24,18 +27,19 @@ namespace TheVoice.Controllers
 
         public async Task<IActionResult> Index()
         {
-            if (_context == null)
+            if (_context != null)
             {
-
-            }
-
-            //if mentor
-            {
-                var vm = await GetMentorHomeBag();
-                if (vm != null)
-                { return View("MentorsHomeIndex", vm); }
-                else
-                {/*throw him out*/ }
+                if (HttpContext.User.IsInRole("admin"))
+                {
+                    var vm = await GetAdminHomeBag();
+                    return View("AdminHomeIndex", vm);
+                }
+                else if (HttpContext.User.IsInRole("mentor"))
+                {
+                    var vm = await GetMentorHomeBag();
+                    if (vm != null)
+                    { return View("MentorsHomeIndex", vm); }
+                }
             }
 
             return View();
@@ -53,7 +57,6 @@ namespace TheVoice.Controllers
             return View(new ErrorViewModel { RequestId = System.Diagnostics.Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
 
-
         private async Task<MentorHomeIndexVM?> GetMentorHomeBag()
         {
             Mentor? mentor = await DBDataProvider.GetMentorFullDataForUser(_context, _userManager, HttpContext);
@@ -61,6 +64,12 @@ namespace TheVoice.Controllers
             { return ClassBuilder.ConvertToMentorHomeIndexVM(mentor); }
             else
             { return null; }
+        }
+
+        private async Task<AdminHomeIndexVM> GetAdminHomeBag()
+        {
+            List<Team> teams = await DBDataProvider.GetTeamsFullData(_context, _userManager, HttpContext);
+            return ClassBuilder.ConvertToAdminHomeIndexVM(teams);
         }
     }
 }

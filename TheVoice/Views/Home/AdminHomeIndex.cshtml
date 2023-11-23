@@ -1,4 +1,4 @@
-﻿@model TheVoice.Models.ViewModels.MentorHomeIndexVM
+﻿@model TheVoice.Models.ViewModels.AdminHomeIndexVM
 @{
     ViewData["Title"] = "Home";
 }
@@ -8,15 +8,15 @@
 </div>
 
 <div>
-    <h5 class='text-center'>Teams</h5>
+    <h3 class='text-center'>Teams</h3>
 
-    @foreach(var team in Model.Mentor.Teams)
+    @foreach(var team in Model.Teams)
     {
         <div>
             <div><h5 class='team-name-as-header'>@team.Name</h5></div>
-            @foreach(var candid in team.Candidates){
+             @foreach(var candid in team.Candidates){
                  <div> 
-                     <a class='Candicate-expander-btn' data-bs-toggle='collapse' href='#t-@candid.Id'
+                     <a class='Candicate-expander-btn' data-bs-toggle='collapse' href='#t-@candid.Id' 
                      role='button' aria-expanded='false' aria-controls='t-@candid.Id'
                      >@candid.Name</a>
                      <div id='t-@candid.Id' class='collapse'>
@@ -42,7 +42,7 @@
                          <div>Avg: @team.AverageScore</div>
                      </div>
                  </div>
-            }
+             }
         </div>
     }
 </div>

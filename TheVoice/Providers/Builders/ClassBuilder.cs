@@ -9,5 +9,10 @@ namespace TheVoice.Providers.Builders
         {
             return new MentorHomeIndexVM() { Mentor = mentor };
         }
+
+        internal static AdminHomeIndexVM ConvertToAdminHomeIndexVM(List<Team> teams)
+        {
+            return new AdminHomeIndexVM() { Teams = teams };
+        }
     }
 }

@@ -21,13 +21,33 @@ namespace TheVoice.Providers.DB
                     .Include(it => it.Teams)
                     .ThenInclude(it => it.Candidates)
                     .ThenInclude(it => it.Scores)
-                    .FirstOrDefaultAsync();// (it => it.UserId == user.Id);//TODO uncomment & replace
+                    .FirstOrDefaultAsync(it => it.UserId == user.Id);
 
-                if (mentor != null)//user != null && //TODO uncomment & add
+                if (user != null && mentor != null)
                 { return mentor; }
             }
 
             return null;
         }
+
+        internal static async Task<List<Team>> GetTeamsFullData(ApplicationDbContext context, UserManager<IdentityUser> userManager, HttpContext httpContext)
+        {
+            //its better to only get properties we need but to be brife we get all here
+            if (context.Teams != null)
+            {
+                var teams = await context.Teams
+                    .Include(it=>it.Mentor)
+                    .Include(it => it.Candidates)
+                    .ThenInclude(it => it.Activities)
+                    .ThenInclude(it => it.Scores)
+                    .ToListAsync();
+
+                if (teams != null)
+                { return teams; }
+            }
+
+            return new List<Team>();
+        }
+
     }
 }
