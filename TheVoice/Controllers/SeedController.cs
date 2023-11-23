@@ -10,58 +10,57 @@ namespace TheVoice.Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly UserManager<IdentityUser> _userManager;
+        private readonly RoleManager<IdentityRole> _roleManager;
         public readonly IPasswordHasher<IdentityUser> _passwordHasher;
 
-        public SeedController(ApplicationDbContext context, UserManager<IdentityUser> userManager, IPasswordHasher<IdentityUser> passwordHasher)
+        public SeedController(ApplicationDbContext context,
+            UserManager<IdentityUser> userManager,
+            IPasswordHasher<IdentityUser> passwordHasher
+            ,RoleManager<IdentityRole> roleManager
+            )
         {
             _context = context;
             _userManager = userManager;
+            _roleManager = roleManager;
             _passwordHasher = passwordHasher;
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
             if (_context != null)
             {
                 if (_context.Users.Count() == 0)
                 {
-                    var adminUser = AddIdentityUser("admin1", "a1@X.c", "123");
-                    var mentorUser1 = AddIdentityUser("mentor1", "m1@X.c", "123");
-                    var mentorUser2 = AddIdentityUser("mentor2", "m2@X.c", "123");
-                    var candidUser1 = AddIdentityUser("candid1", "c1@X.c", "123");
-                    var candidUser2 = AddIdentityUser("candid2", "c2@X.c", "123");
+                    var adminUser=await CreateUserAndRole("admin", "Admin", "a@x.c", "12345678");
+                    var mentorUser1 = await CreateUserAndRole("mentor", "mentor1", "m1@x.c", "12345678");
+                    var mentorUser2 = await CreateUserAndRole("mentor", "mentor2", "m2@x.c", "12345678");
+                    var candidUser1 = await CreateUserAndRole("candid", "candid1", "c1@x.c", "12345678");
+                    var candidUser2 = await CreateUserAndRole("candid", "candid2", "c2@x.c", "12345678");
 
-                    IdentityRole adminR = AddRole("admin");
-                    IdentityRole mentorR = AddRole("mentor");
-                    IdentityRole candidR = AddRole("candid");
-
-                    AddRoleToUser(adminUser, adminR);
-                    AddRoleToUser(mentorUser1, mentorR);
-                    AddRoleToUser(mentorUser2, mentorR);
-                    AddRoleToUser(candidUser1, candidR);
-                    AddRoleToUser(candidUser2, candidR);
+                    if(adminUser==null || mentorUser1==null|| mentorUser2==null || candidUser1==null || candidUser2==null)
+                    { return View("index", "Failed to create a user"); }
 
                     Mentor mentor1 = new Mentor() { Name = "Mentor1", UserId = mentorUser1.Id };
                     Mentor mentor2 = new Mentor() { Name = "Mentor2", UserId = mentorUser2.Id };
 
-                    _context.Mentores.AddRangeAsync(new List<Mentor>() { mentor1, mentor2 });
+                     await _context.Mentores.AddRangeAsync(new List<Mentor>() { mentor1, mentor2 });
                     _context.SaveChanges();
 
                     Team team1 = new Team() { Name = "Team1", MentorId = mentor1.Id };
                     Team team2 = new Team() { Name = "Team2", MentorId = mentor2.Id };
 
-                    _context.Teams.AddRangeAsync(new List<Team>() { team1, team2 });
+                     await _context.Teams.AddRangeAsync(new List<Team>() { team1, team2 });
                     _context.SaveChanges();
 
                     Candicate candicate1 = new Candicate() { Name = "Candid1", TeamId = team1.Id, UserId = candidUser1.Id };
                     Candicate candicate2 = new Candicate() { Name = "Candid2", TeamId = team2.Id, UserId = candidUser2.Id };
 
-                    _context.Candicates.AddRangeAsync(new List<Candicate>() { candicate1, candicate2 });
+                     await _context.Candicates.AddRangeAsync(new List<Candicate>() { candicate1, candicate2 });
                     _context.SaveChanges();
 
                     Activity activity = new Activity() { Date = DateTime.Now, SongName = "Song1" };
 
-                    _context.Activities.AddAsync(activity);
+                    _ = await _context.Activities.AddAsync(activity);
                     _context.SaveChanges();
 
                     Score score1 = new Score() { ActivityId = activity.Id, CandicateId = candicate1.Id, MentorId = mentor1.Id, Value = 28 };
@@ -69,9 +68,10 @@ namespace TheVoice.Controllers
                     Score score3 = new Score() { ActivityId = activity.Id, CandicateId = candicate1.Id, MentorId = mentor2.Id, Value = 70 };
                     Score score4 = new Score() { ActivityId = activity.Id, CandicateId = candicate2.Id, MentorId = mentor2.Id, Value = 80 };
 
-                    _context.Scores.AddRangeAsync(new List<Score>() { score1, score2, score3, score4 });
+                    await _context.Scores.AddRangeAsync(new List<Score>() { score1, score2, score3, score4 });
                     _context.SaveChanges();
-                    return View("index","Done");
+                    
+                    return View("index", "Done");
                 }
                 else
                 { return View("index", "Already filled"); }
@@ -82,18 +82,16 @@ namespace TheVoice.Controllers
             }
         }
 
-        private IdentityRole AddRole(string name)
+        private async Task<IdentityRole> AddRole(string name)
         {
-            var role = new IdentityRole() { Name = name, NormalizedName = name.ToUpper() };
-            _context.Roles.Add(role);
-            _context.SaveChanges();
+            IdentityRole role = new IdentityRole(name);
+             _ = await _roleManager.CreateAsync(role);
             return role;
         }
 
-        public Task<IdentityResult>? AddRoleToUser(IdentityUser user, IdentityRole role)
+        public Task<IdentityResult> AddRoleToUser(IdentityUser user, IdentityRole role)
         {
-            Task<IdentityResult>? result = _userManager.AddToRoleAsync(user, role.Name);
-            _context.SaveChanges();
+            Task<IdentityResult> result = _userManager.AddToRoleAsync(user, role.Name);
             return result;
         }
 
@@ -117,6 +115,35 @@ namespace TheVoice.Controllers
             _context.SaveChanges();
 
             return applicationUser;
+        }
+
+        private async Task<IdentityUser?> CreateUserAndRole(string roleName, string name, string email, string password)
+        {
+            
+            var roleExists =await _roleManager.RoleExistsAsync(roleName);
+            if (!roleExists)
+            {
+                var role = new IdentityRole();
+                role.Name = roleName;
+                await _roleManager.CreateAsync(role);
+            }
+
+            IdentityUser applicationUser = new IdentityUser();
+            Guid guid = Guid.NewGuid();
+            applicationUser.Id = guid.ToString();
+            applicationUser.UserName = name;
+            applicationUser.Email = email;
+            applicationUser.NormalizedUserName = email.ToUpper();
+            applicationUser.EmailConfirmed = true;
+
+            var result= await _userManager.CreateAsync(applicationUser, password);
+
+            if (result.Succeeded)
+            {
+                await _userManager.AddToRoleAsync(applicationUser, roleName);
+                return applicationUser;
+            }
+            return null;
         }
     }
 }

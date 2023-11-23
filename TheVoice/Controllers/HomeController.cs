@@ -12,6 +12,7 @@ using TheVoice.Providers.User;
 
 namespace TheVoice.Controllers
 {
+    [Authorize(Roles = "admin,mentor,candicate")]
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
