@@ -12,7 +12,7 @@ using TheVoice.Providers.User;
 
 namespace TheVoice.Controllers
 {
-    //[Authorize(Roles = "admin,mentor,candicate")]
+    [Authorize(Roles = "admin,mentor,candicate")]
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
@@ -30,18 +30,18 @@ namespace TheVoice.Controllers
         {
             if (_context != null)
             {
-                //if (HttpContext.User.IsInRole("admin"))
-                //{
+                if (HttpContext.User.IsInRole("admin"))
+                {
                     var vm = await GetAdminHomeBag();
                     return View("AdminHomeIndex", vm);
-                //}
-                //else 
-                //if (HttpContext.User.IsInRole("mentor"))
-                //{
-                //    var vm = await GetMentorHomeBag();
-                //    if (vm != null)
-                //    { return View("MentorsHomeIndex", vm); }
-                //}
+                }
+                else
+                if (HttpContext.User.IsInRole("mentor"))
+                {
+                    var vm = await GetMentorHomeBag();
+                    if (vm != null)
+                    { return View("MentorsHomeIndex", vm); }
+                }
             }
 
             return View();

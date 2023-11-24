@@ -31,7 +31,7 @@ namespace TheVoice.Controllers
             {
                 if (_context.Users.Count() == 0)
                 {
-                    var adminUser=await CreateUserAndRole("admin", "Admin", "a@x.c", "12345678");
+                    var adminUser=await CreateUserAndRole("admin", "admin", "a@x.c", "Insert@1393");
                     var mentorUser1 = await CreateUserAndRole("mentor", "mentor1", "m1@x.c", "12345678");
                     var mentorUser2 = await CreateUserAndRole("mentor", "mentor2", "m2@x.c", "12345678");
                     var candidUser1 = await CreateUserAndRole("candid", "candid1", "c1@x.c", "12345678");
@@ -131,29 +131,21 @@ namespace TheVoice.Controllers
 
         private async Task<IdentityUser?> CreateUserAndRole(string roleName, string name, string email, string password)
         {
-            
             var roleExists =await _roleManager.RoleExistsAsync(roleName);
             if (!roleExists)
             {
-                var role = new IdentityRole();
-                role.Name = roleName;
+                var role = new IdentityRole(roleName);
                 await _roleManager.CreateAsync(role);
             }
 
-            IdentityUser applicationUser = new IdentityUser();
-            Guid guid = Guid.NewGuid();
-            applicationUser.Id = guid.ToString();
-            applicationUser.UserName = name;
-            applicationUser.Email = email;
-            applicationUser.NormalizedUserName = email.ToUpper();
-            applicationUser.EmailConfirmed = true;
+            IdentityUser user = new() { UserName = name, Email = email, EmailConfirmed = true };
 
-            var result= await _userManager.CreateAsync(applicationUser, password);
+            var result= await _userManager.CreateAsync(user, password);
 
             if (result.Succeeded)
             {
-                await _userManager.AddToRoleAsync(applicationUser, roleName);
-                return applicationUser;
+                await _userManager.AddToRoleAsync(user, roleName);
+                return user;
             }
             return null;
         }
