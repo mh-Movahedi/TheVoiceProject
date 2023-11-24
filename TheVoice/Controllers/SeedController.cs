@@ -36,8 +36,9 @@ namespace TheVoice.Controllers
                     var mentorUser2 = await CreateUserAndRole("mentor", "mentor2", "m2@x.c", "12345678");
                     var candidUser1 = await CreateUserAndRole("candid", "candid1", "c1@x.c", "12345678");
                     var candidUser2 = await CreateUserAndRole("candid", "candid2", "c2@x.c", "12345678");
+                    var candidUser3 = await CreateUserAndRole("candid", "candid3", "c2@x.c", "12345678");
 
-                    if(adminUser==null || mentorUser1==null|| mentorUser2==null || candidUser1==null || candidUser2==null)
+                    if (adminUser==null || mentorUser1==null|| mentorUser2==null || candidUser1==null || candidUser2== null || candidUser3 == null)
                     { return View("index", "Failed to create a user"); }
 
                     Mentor mentor1 = new Mentor() { Name = "Mentor1", UserId = mentorUser1.Id };
@@ -52,23 +53,34 @@ namespace TheVoice.Controllers
                      await _context.Teams.AddRangeAsync(new List<Team>() { team1, team2 });
                     _context.SaveChanges();
 
-                    Candicate candicate1 = new Candicate() { Name = "Candid1", TeamId = team1.Id, UserId = candidUser1.Id };
-                    Candicate candicate2 = new Candicate() { Name = "Candid2", TeamId = team2.Id, UserId = candidUser2.Id };
+                    Activity activity1 = new Activity() { Date = DateTime.Now, SongName = "Song1" };
+                    Activity activity2 = new Activity() { Date = DateTime.Now.AddDays(-1), SongName = "Song2" };
 
-                     await _context.Candicates.AddRangeAsync(new List<Candicate>() { candicate1, candicate2 });
+                    await _context.Activities.AddRangeAsync(new List<Activity>() { activity1, activity2 });
                     _context.SaveChanges();
 
-                    Activity activity = new Activity() { Date = DateTime.Now, SongName = "Song1" };
 
-                    _ = await _context.Activities.AddAsync(activity);
+                    Candicate candicate1 = new Candicate() { Name = "Candid1", TeamId = team1.Id, UserId = candidUser1.Id, Activities = new() { activity1, activity2 } };
+                    Candicate candicate2 = new Candicate() { Name = "Candid2", TeamId = team2.Id, UserId = candidUser2.Id, Activities = new() { activity1 } };
+                    Candicate candicate3= new Candicate() { Name = "Candid3", TeamId = team1.Id, UserId = candidUser3.Id, Activities = new() { activity1, activity2 } };
+
+                    await _context.Candicates.AddRangeAsync(new List<Candicate>() { candicate1, candicate2, candicate3 });
                     _context.SaveChanges();
 
-                    Score score1 = new Score() { ActivityId = activity.Id, CandicateId = candicate1.Id, MentorId = mentor1.Id, Value = 28 };
-                    Score score2 = new Score() { ActivityId = activity.Id, CandicateId = candicate2.Id, MentorId = mentor1.Id, Value = 30 };
-                    Score score3 = new Score() { ActivityId = activity.Id, CandicateId = candicate1.Id, MentorId = mentor2.Id, Value = 70 };
-                    Score score4 = new Score() { ActivityId = activity.Id, CandicateId = candicate2.Id, MentorId = mentor2.Id, Value = 80 };
 
-                    await _context.Scores.AddRangeAsync(new List<Score>() { score1, score2, score3, score4 });
+                    Score score1 = new Score() { ActivityId = activity1.Id, CandicateId = candicate1.Id, MentorId = mentor1.Id, Value = 28 };
+                    Score score2 = new Score() { ActivityId = activity1.Id, CandicateId = candicate2.Id, MentorId = mentor1.Id, Value = 30 };
+                    Score score3 = new Score() { ActivityId = activity1.Id, CandicateId = candicate1.Id, MentorId = mentor2.Id, Value = 70 };
+                    Score score4 = new Score() { ActivityId = activity1.Id, CandicateId = candicate2.Id, MentorId = mentor2.Id, Value = 80 };
+                    Score score5 = new Score() { ActivityId = activity2.Id, CandicateId = candicate1.Id, MentorId = mentor1.Id, Value = 68 };
+                    Score score6 = new Score() { ActivityId = activity2.Id, CandicateId = candicate1.Id, MentorId = mentor2.Id, Value = 60 };
+
+                    Score score7 = new Score() { ActivityId = activity1.Id, CandicateId = candicate3.Id, MentorId = mentor1.Id, Value = 68 };
+                    Score score8 = new Score() { ActivityId = activity1.Id, CandicateId = candicate3.Id, MentorId = mentor2.Id, Value = 78 };
+                    Score score9 = new Score() { ActivityId = activity2.Id, CandicateId = candicate3.Id, MentorId = mentor1.Id, Value = 88 };
+                    Score score10 = new Score() { ActivityId = activity2.Id, CandicateId = candicate3.Id, MentorId = mentor2.Id, Value = 90 };
+
+                    await _context.Scores.AddRangeAsync(new List<Score>() { score1, score2, score3, score4, score5, score6, score7, score8, score9, score10 });
                     _context.SaveChanges();
                     
                     return View("index", "Done");

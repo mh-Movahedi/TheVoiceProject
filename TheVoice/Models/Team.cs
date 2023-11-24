@@ -17,20 +17,43 @@ namespace TheVoice.Models
 
         public List<Candicate> Candidates { get; set; } = new();
 
-        public double? AverageScore
+        public double? GetAverage()
         {
-            get
+            if (Candidates != null && Candidates.Count > 0)
             {
-                if (Candidates != null && Candidates.Count > 0)
-                {
-                    var scores = Candidates.SelectMany(it => it.Scores).Where(it => it != null).ToList();
+                var scores = Candidates.SelectMany(it => it.Scores).Where(it => it != null).ToList();
 
-                    if (scores != null && scores.Count > 0)
-                    { return scores.Average(it => it.Value); }
-                }
-
-                return null;
+                if (scores != null && scores.Count > 0)
+                { return scores.Average(it => it.Value); }
             }
+
+            return null;
+        }
+
+        public double? GetCandidAverage(int candidId)
+        {
+            if (Candidates != null && Candidates.Count > 0)
+            {
+                var scores = Candidates.SelectMany(it => it.Scores).Where(it => it != null && it.CandicateId == candidId).ToList();
+
+                if (scores != null && scores.Count > 0)
+                { return scores.Average(it => it.Value); }
+            }
+
+            return null;
+        }
+
+        public double? GetActivityAverage(int activityId)
+        {
+            if (Candidates != null && Candidates.Count > 0)
+            {
+                var scores = Candidates.SelectMany(it => it.Scores).Where(it => it != null && it.ActivityId == activityId).ToList();
+
+                if (scores != null && scores.Count > 0)
+                { return scores.Average(it => it.Value); }
+            }
+
+            return null;
         }
     }
 }

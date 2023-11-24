@@ -36,9 +36,10 @@ namespace TheVoice.Providers.DB
             if (context.Teams != null)
             {
                 var teams = await context.Teams
-                    .Include(it=>it.Mentor)
+                    .Include(it => it.Mentor)
                     .Include(it => it.Candidates)
                     .ThenInclude(it => it.Activities)
+                    .Include(it => it.Candidates)
                     .ThenInclude(it => it.Scores)
                     .ToListAsync();
 

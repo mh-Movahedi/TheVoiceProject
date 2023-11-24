@@ -16,6 +16,5 @@ namespace TheVoice.Data
             : base(options)
         {
         }
-
     }
 }

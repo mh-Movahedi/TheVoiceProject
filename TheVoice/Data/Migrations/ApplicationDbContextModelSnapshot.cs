@@ -34,7 +34,7 @@ namespace TheVoice.Data.Migrations
 
                     b.HasIndex("CandicatesId");
 
-                    b.ToTable("ActivityCandicate");
+                    b.ToTable("ActivityCandicate", (string)null);
                 });
 
             modelBuilder.Entity("ActivityMentor", b =>
@@ -49,7 +49,7 @@ namespace TheVoice.Data.Migrations
 
                     b.HasIndex("MentorsId");
 
-                    b.ToTable("ActivityMentor");
+                    b.ToTable("ActivityMentor", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -271,7 +271,7 @@ namespace TheVoice.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Activities");
+                    b.ToTable("Activities", (string)null);
                 });
 
             modelBuilder.Entity("TheVoice.Models.Candicate", b =>
@@ -297,7 +297,7 @@ namespace TheVoice.Data.Migrations
 
                     b.HasIndex("TeamId");
 
-                    b.ToTable("Candicates");
+                    b.ToTable("Candicates", (string)null);
                 });
 
             modelBuilder.Entity("TheVoice.Models.Mentor", b =>
@@ -318,7 +318,7 @@ namespace TheVoice.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Mentores");
+                    b.ToTable("Mentores", (string)null);
                 });
 
             modelBuilder.Entity("TheVoice.Models.Score", b =>
@@ -349,7 +349,7 @@ namespace TheVoice.Data.Migrations
 
                     b.HasIndex("MentorId");
 
-                    b.ToTable("Scores");
+                    b.ToTable("Scores", (string)null);
                 });
 
             modelBuilder.Entity("TheVoice.Models.Team", b =>
@@ -371,7 +371,7 @@ namespace TheVoice.Data.Migrations
 
                     b.HasIndex("MentorId");
 
-                    b.ToTable("Teams");
+                    b.ToTable("Teams", (string)null);
                 });
 
             modelBuilder.Entity("ActivityCandicate", b =>
